@@ -75,10 +75,10 @@ def parse_filed_for_win_check(field):
         back_slash += field[i][dimension - 1 - i]
         if check_tuple_win(list(field[i])):
             is_win = True
-        args = ''
+        column = ''
         for j in range(dimension):
-            args += global_field[j][i]
-        if check_tuple_win(list(args)):
+            column += global_field[j][i]
+        if check_tuple_win(list(column)):
             is_win = True
     if check_tuple_win(slash) or check_tuple_win(back_slash):
         is_win = True
