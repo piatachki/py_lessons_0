@@ -1,7 +1,8 @@
-# Константы / настройки
-# Размерность карты
 import itertools
 
+# Константы / настройки
+
+# Размерность карты
 dimension = 3
 # Значение пустой клетки
 placeholder = ' '
@@ -20,9 +21,8 @@ def init_field():
 # ToDo сделать независимым от размера поля
 def print_field(field):
     print("")
-    print("   1 2 3")
-    for i in field:
-        print(f" idx {i[0]} {i[1]} {i[2]} ")
+    for i in range(dimension):
+        print(field[i])
     print("")
 
 
@@ -57,11 +57,32 @@ def parse_user_input(user_input):
 
 # Метод проверки того, что кортеж полон и
 # полностью заполнен символом одного из игроков
-def check_tuple_win(*args):
+def check_tuple_win(args):
     distinct_args = set(args)
     return len(args) == dimension and \
            len(distinct_args) == 1 and \
            placeholder not in distinct_args
+
+
+# Парсим поле и проверяем каждый вариант на победу
+# строки, столбцы, две диагонали
+def parse_filed_for_win_check(field):
+    is_win = False
+    slash = ''
+    back_slash = ''
+    for i in range(dimension):
+        slash += field[i][i]
+        back_slash += field[i][dimension - 1 - i]
+        if check_tuple_win(list(field[i])):
+            is_win = True
+        args = ''
+        for j in range(dimension):
+            args += global_field[j][i]
+        if check_tuple_win(list(args)):
+            is_win = True
+    if check_tuple_win(slash) or check_tuple_win(back_slash):
+        is_win = True
+    return is_win
 
 
 # Генератор для определения очередности ходов
@@ -80,3 +101,6 @@ for side in get_play_side():
         coords = input_coords(side)
     global_field[coords[0]][coords[1]] = side
     print_field(global_field)
+    if parse_filed_for_win_check(global_field):
+        print(f"Победил { side }")
+        break
