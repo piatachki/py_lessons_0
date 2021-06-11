@@ -8,8 +8,8 @@ dimension = 3
 placeholder = ' '
 
 
-# Инициализация объекта поля для новой игры
 def init_field():
+    """Инициализация объекта поля для новой игры"""
     field = []
     for i in range(dimension):
         row = [placeholder] * dimension
@@ -17,25 +17,24 @@ def init_field():
     return field
 
 
-# Вывод карты на экран
-# ToDo сделать независимым от размера поля
 def print_field(field):
+    """Вывод карты на экран"""
     print("")
     for i in range(dimension):
         print(field[i])
     print("")
 
 
-# Метод получения координат от пользователя, валидации и записи в поле
 def input_coords(play_side):
+    """Метод получения координат от пользователя, валидации"""
     user_input = ''
     while not validate_user_input(user_input):
         user_input = input(f"Ход {play_side}: введите координаты: x y\n")
     return parse_user_input(user_input)
 
 
-# Метод валидации строки пользовательского ввода
 def validate_user_input(user_input):
+    """Метод валидации строки пользовательского ввода"""
     user_input_list = str.split(user_input)
     return len(user_input_list) == 2 and \
            str.isdigit(user_input_list[0]) and \
@@ -44,29 +43,29 @@ def validate_user_input(user_input):
            0 < int(user_input_list[1]) <= dimension
 
 
-# Метод проверки, что планируемая к заполнению ячейка не занята
-def validate_field_place(examine_coords):
-    return global_field[examine_coords[0]][examine_coords[1]] == placeholder
+def validate_field_place(field, examine_coords):
+    """Метод проверки, что планируемая к заполнению ячейка не занята"""
+    return field[examine_coords[0]][examine_coords[1]] == placeholder
 
 
-# Метод парсинга пользовательского воода
 def parse_user_input(user_input):
+    """Метод парсинга пользовательского воода"""
     user_input_list = str.split(user_input)
     return int(user_input_list[0]) - 1, int(user_input_list[1]) - 1
 
 
-# Метод проверки того, что кортеж полон и
-# полностью заполнен символом одного из игроков
 def check_tuple_win(args):
+    """Метод проверки того, что кортеж полон и
+    полностью заполнен символом одного из игроков"""
     distinct_args = set(args)
     return len(args) == dimension and \
            len(distinct_args) == 1 and \
            placeholder not in distinct_args
 
 
-# Парсим поле и проверяем каждый вариант на победу
-# строки, столбцы, две диагонали
 def parse_filed_for_win_check(field):
+    """Парсим поле и проверяем каждый вариант на победу
+    строки, столбцы, две диагонали"""
     is_win = False
     slash = ''
     back_slash = ''
@@ -77,7 +76,7 @@ def parse_filed_for_win_check(field):
             is_win = True
         column = ''
         for j in range(dimension):
-            column += global_field[j][i]
+            column += field[j][i]
         if check_tuple_win(list(column)):
             is_win = True
     if check_tuple_win(slash) or check_tuple_win(back_slash):
@@ -85,22 +84,27 @@ def parse_filed_for_win_check(field):
     return is_win
 
 
-# Генератор для определения очередности ходов
 def get_play_side():
+    """Генератор для определения очередности ходов"""
     side_sequence = 'X0'
     for play_side in itertools.cycle(side_sequence):
         yield play_side
 
 
-# Точка входа
-global_field = init_field()
-for side in get_play_side():
-    coords = input_coords(side)
-    while not validate_field_place(coords):
-        print(f"Координаты { coords[0] } { coords[1] } уже заняты. Нужно бы повторить ход")
+def game_cycle():
+    """Основной цикл игры"""
+    field = init_field()
+    print(f"Крестики-нолики. Игра на поле { dimension }x{ dimension }")
+    for side in get_play_side():
         coords = input_coords(side)
-    global_field[coords[0]][coords[1]] = side
-    print_field(global_field)
-    if parse_filed_for_win_check(global_field):
-        print(f"Победил { side }")
-        break
+        while not validate_field_place(field, coords):
+            print(f"Координаты { coords[0] } { coords[1] } уже заняты. Нужно бы повторить ход")
+            coords = input_coords(side)
+        field[coords[0]][coords[1]] = side
+        print_field(field)
+        if parse_filed_for_win_check(field):
+            print(f"Конец истории. Победил { side }")
+            break
+
+
+game_cycle()
